@@ -237,13 +237,7 @@ resource "aws_security_group" "ssh" {
         from_port = 22
         to_port = 22
         protocol = "tcp"
-        cidr_blocks = ["${lookup(var.vpc_networks,var.aws_region)}.0.0/16"]
-    }
-    ingress {
-        from_port = 22
-        to_port = 22
-        protocol = "tcp"
-        security_groups = [ "${aws_security_group.sshc.id" ]
+        cidr_blocks = ["142.254.16.146/32","${lookup(var.vpc_networks,var.aws_region)}.0.0/16","23.121.240.216/32"]
     }
 }
 
@@ -310,19 +304,11 @@ resource "aws_security_group" "nat" {
     description = "Allow any HTTP, HTTPS and ICMP."
     vpc_id = "${aws_vpc.primary.id}"
 
-    // SMTP
     ingress {
-        from_port = 25
-        to_port = 25
+        from_port = 22
+        to_port = 22
         protocol = "tcp"
-        security_groups = ["${aws_security_group.natc.id}"]
-    }
-    // Mailgun SMTP
-    ingress {
-        from_port = 587
-        to_port = 587
-        protocol = "tcp"
-        security_groups = ["${aws_security_group.natc.id}"]
+        cidr_blocks = ["142.154.16.146/32"]
     }
     ingress {
         from_port = 80
@@ -356,7 +342,7 @@ resource "aws_instance" "nat" {
     ami = "${lookup(var.aws_nat_amis,var.aws_region)}"
     instance_type = "m3.medium"
     key_name = "${var.aws_key_name}"
-    security_groups = [ "${aws_security_group.nat.id}", "${aws_security_group.ssh.id}" ]
+    security_groups = [ "${aws_security_group.nat.id}" ]
     subnet_id = "${aws_subnet.dmzA.id}"
     source_dest_check = false
     tags {
