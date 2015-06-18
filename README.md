@@ -1,19 +1,19 @@
 ## Outputs
-```
-datacenter_id
-datacenter_network
-datacenter_subnet_dmzA_id
-datacenter_subnet_dmzB_id
-datacenter_subnet_natA_id
-datacenter_subnet_natB_id
-cache_client_sg
-cache_sg
-search_client_sg
-search_sg
-web_sg
-ssh_sg
-ssh_client_sg
-db_sg
-db_client_sg
-datacenter_nat_subnet_default_security_group_id
-```
+Variable | Purpose
+--- | --- |
+`datacenter_id` | Logical datacenter ID
+`datacenter_network` | Logical datacenter CIDR
+`datacenter_subnet_dmzA_id` | Logical datacenter Demilitarized -- Public -- subnet id in availability zone A
+`datacenter_subnet_dmzB_id` | Logical datacenter Demilitarized -- Public -- subnet id in availability zone B
+`datacenter_subnet_natA_id` | Logical datacenter NAT -- Private -- subnet id in availability zone A
+`datacenter_subnet_natB_id` | Logical datacenter NAT -- Private -- subnet id in availability zone B
+`cache_client_sg` | Whitelist security group for redis servers. Any host that has this security group applied will be able to communicate on `tcpv4:6379` to hosts which have `cache_sg` applied.
+`cache_sg` | Allow communication on `tcpv4:6379` for hosts with `cache_client_sg` applied.
+`search_client_sg` | Whitelist security group for elastic servers. Any instance that has this security group applied will be able to communicate on `tcpv4:9200` and `tcpv4:9300` to instances which have `cache_sg` applied.
+`search_sg` | Allow communication on `tcpv4:9200` and `tcpv4:9300` for hosts with `search_client_sg` applied.
+`web_sg` | Allow communication on `tcpv4:80` and `tcpv4:443` from any.
+`ssh_sg` | Allow communication on `tcpv4:22` for hosts with `ssh_client_sg` applied.
+`ssh_client_sg` | Whitelist security group for ssh servers. Any host that has this security group applied will be able to communicate on `tcpv4:22` to hosts which have `ssh_sg` applied.
+`db_sg` | Allow communcation on `tcpv4:5432` for hosts with `db_client_sg` applied.
+`db_client_sg` | Whitelist security group for postgresql servers. Any host that has this security group applied will be able to communicate on `tcpv4:5432` to hosts which have `db_sg` applied .
+`datacenter_nat_subnet_default_security_group_id` |`Whitelist security group for nat servers. Any host that has this security group applied will be able to communicate on `tcpv4:25`, `tcpv4:80`, `tcpv4:443`, `tcpv4:587`, and `icmp:-1` to the NAT instance. This allows these communications to be translated to the public internet. If this security group is *not* applied, interfaces will not be able to communicate with the public internet.
