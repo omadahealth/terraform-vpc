@@ -14,12 +14,12 @@ provider "aws" {
 
 resource "aws_vpc" "primary" {
     instance_tenancy = "dedicated"
-    cidr_block = "${lookup(var.vpc_networks,var.aws_region)}.0.0/16"
+    cidr_block = "${var.cidr_base}.0/24"
     enable_dns_support = true
     enable_dns_hostnames = true
 
     tags {
-        Name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-${var.aws_region}"
+        Name = "vpc-${var.cidr_base}-${var.aws_region}"
     }
 }
 
@@ -44,10 +44,10 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_subnet" "dmzA" {
     vpc_id = "${aws_vpc.primary.id}"
     availability_zone = "${var.aws_region}a"
-    cidr_block = "${lookup(var.vpc_networks,var.aws_region)}.0.0/24"
+    cidr_block = "${var.cidr_base}.0/26"
     map_public_ip_on_launch = "true"
     tags {
-        Name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-subnet-dmzA"
+        Name = "vpc-${var.cidr_base}-subnet-dmzA"
     }
 }
 
@@ -63,10 +63,10 @@ resource "aws_route_table_association" "dmzA-dmz" {
 resource "aws_subnet" "dmzB" {
     vpc_id = "${aws_vpc.primary.id}"
     availability_zone = "${var.aws_region}b"
-    cidr_block = "${lookup(var.vpc_networks,var.aws_region)}.1.0/24"
+    cidr_block = "${var.cidr_base}.64/26"
     map_public_ip_on_launch = "true"
     tags {
-        Name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-subnet-dmzB"
+        Name = "vpc-${var.cidr_base}-subnet-dmzB"
     }
 }
 
@@ -84,10 +84,10 @@ resource "aws_route_table_association" "dmzB-dmz" {
 resource "aws_subnet" "natA" {
     vpc_id = "${aws_vpc.primary.id}"
     availability_zone = "${var.aws_region}a"
-    cidr_block = "${lookup(var.vpc_networks,var.aws_region)}.128.0/24"
+    cidr_block = "${var.cidr_base}.128/26"
     map_public_ip_on_launch = "false"
     tags {
-        Name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-subnet-natA"
+        Name = "vpc-${var.cidr_base}-subnet-natA"
     }
 }
 
@@ -103,10 +103,10 @@ resource "aws_route_table_association" "natA-nat" {
 resource "aws_subnet" "natB" {
     vpc_id = "${aws_vpc.primary.id}"
     availability_zone = "${var.aws_region}b"
-    cidr_block = "${lookup(var.vpc_networks,var.aws_region)}.129.0/24"
+    cidr_block = "${var.cidr_base}.192/26"
     map_public_ip_on_launch = "false"
     tags {
-        Name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-subnet-natB"
+        Name = "vpc-${var.cidr_base}-subnet-natB"
     }
 }
 
@@ -121,7 +121,7 @@ resource "aws_route_table_association" "natB-nat" {
 
 // Security Groups
 resource "aws_security_group" "cachec" {
-    name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-CACHE-Clients"
+    name = "vpc-${var.cidr_base}-CACHE-Clients"
     description = "Whitelist Redis (tcp 6379)"
     vpc_id = "${aws_vpc.primary.id}"
 }
@@ -131,7 +131,7 @@ output "cache_client_sg" {
 }
 
 resource "aws_security_group" "cache" {
-    name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-CACHE"
+    name = "vpc-${var.cidr_base}-CACHE"
     description = "Allow Redis (tcp 6379)"
     vpc_id = "${aws_vpc.primary.id}"
 
@@ -149,7 +149,7 @@ output "cache_sg" {
 }
 
 resource "aws_security_group" "searchc" {
-    name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-SEARCH-Clients"
+    name = "vpc-${var.cidr_base}-SEARCH-Clients"
     description = "Whitelist Elasticsearch (tcp 9200)"
     vpc_id = "${aws_vpc.primary.id}"
 }
@@ -159,7 +159,7 @@ output "search_client_sg" {
 }
 
 resource "aws_security_group" "search" {
-    name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-SEARCH"
+    name = "vpc-${var.cidr_base}-SEARCH"
     description = "Allow Elasticsearch (tcp 9200)"
     vpc_id = "${aws_vpc.primary.id}"
 
@@ -206,7 +206,7 @@ output "search_sg" {
 }
 
 resource "aws_security_group" "web" {
-    name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-WEB"
+    name = "vpc-${var.cidr_base}-WEB"
     description = "Allow HTTP and HTTPS from Any"
     vpc_id = "${aws_vpc.primary.id}"
 
@@ -229,7 +229,7 @@ output "web_sg" {
 }
 
 resource "aws_security_group" "ssh" {
-    name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-SSH"
+    name = "vpc-${var.cidr_base}-SSH"
     description = "Allow SSH"
     vpc_id = "${aws_vpc.primary.id}"
 
@@ -237,7 +237,7 @@ resource "aws_security_group" "ssh" {
         from_port = 22
         to_port = 22
         protocol = "tcp"
-        cidr_blocks = ["${aws_security_group.sshc.id}"]
+        security_groups = ["${aws_security_group.sshc.id}"]
     }
 }
 
@@ -246,7 +246,7 @@ output "ssh_sg" {
 }
 
 resource "aws_security_group" "sshc" {
-    name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-SSH-Clients"
+    name = "vpc-${var.cidr_base}-SSH-Clients"
     description = "Whitelist SSH Clients"
     vpc_id = "${aws_vpc.primary.id}"
 }
@@ -256,7 +256,7 @@ output "ssh_client_sg" {
 }
 
 resource "aws_security_group" "db" {
-    name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-DB"
+    name = "vpc-${var.cidr_base}-DB"
     description = "Allow Postgres"
     vpc_id = "${aws_vpc.primary.id}"
 
@@ -274,7 +274,7 @@ output "db_sg" {
 }
 
 resource "aws_security_group" "dbc" {
-    name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-DB-Clients"
+    name = "vpc-${var.cidr_base}-DB-Clients"
     description = "Whitelist Postgres Clients"
     vpc_id = "${aws_vpc.primary.id}"
 }
@@ -290,7 +290,7 @@ output "db_client_sg" {
 // Security Group
 
 resource "aws_security_group" "natc" {
-    name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-NAT-Clients"
+    name = "vpc-${var.cidr_base}-NAT-Clients"
     description = "Used to whitelist clients to NAT host"
     vpc_id = "${aws_vpc.primary.id}"
 }
@@ -300,7 +300,7 @@ output "nat_client_sg" {
 }
 
 resource "aws_security_group" "nat" {
-    name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-NAT"
+    name = "vpc-${var.cidr_base}-NAT"
     description = "Allow any HTTP, HTTPS and ICMP."
     vpc_id = "${aws_vpc.primary.id}"
 
@@ -308,7 +308,7 @@ resource "aws_security_group" "nat" {
         from_port = 25
         to_port = 25
         protocol = "tcp"
-        cidr_blocks = ["${aws_security_group.natc.id}"]
+        security_groups = ["${aws_security_group.natc.id}"]
     }
     ingress {
         from_port = 80
@@ -348,11 +348,11 @@ resource "aws_instance" "nat" {
     ami = "${lookup(var.aws_nat_amis,var.aws_region)}"
     instance_type = "m3.medium"
     key_name = "${var.aws_key_name}"
-    security_groups = [ "${aws_security_group.nat.id}", "${aws_security_group.ssh.id}" ]
+    vpc_security_group_ids = [ "${aws_security_group.nat.id}", "${aws_security_group.ssh.id}" ]
     subnet_id = "${aws_subnet.dmzA.id}"
     source_dest_check = false
     tags {
-        Name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-nat"
+        Name = "vpc-${var.cidr_base}-nat"
     }
 }
 
@@ -372,7 +372,7 @@ resource "aws_route_table" "dmz" {
         gateway_id = "${aws_internet_gateway.igw.id}"
     }
     tags {
-        Name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-dmz-rtb"
+        Name = "vpc-${var.cidr_base}-dmz-rtb"
     }
 }
 
@@ -383,6 +383,6 @@ resource "aws_route_table" "nat" {
         instance_id = "${aws_instance.nat.id}"
     }
     tags {
-        Name = "vpc-${lookup(var.vpc_networks,var.aws_region)}-nat-rtb"
+        Name = "vpc-${var.cidr_base}-nat-rtb"
     }
 }

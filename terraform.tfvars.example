@@ -2,3 +2,4 @@ aws_access_key = ""
 aws_secret_key = ""
 aws_key_name = ""
 aws_region = ""
+cidr_base = "" // please see note in README.md

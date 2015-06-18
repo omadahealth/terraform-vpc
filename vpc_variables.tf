@@ -4,18 +4,11 @@
 
 variable "aws_access_key" {}
 variable "aws_secret_key" {}
-
+variable "cidr_base" {}
 variable "aws_key_name" {}
 
 variable "aws_region" {
     default = "us-west-2"
-}
-
-variable "vpc_networks" {
-    default = {
-        us-west-2 = "10.110"
-        us-east-1 = "10.250"
-    }
 }
 
 variable "az3" {
