@@ -1,3 +1,17 @@
+## Inputs
+Input | Purpose
+--- | --- |
+`aws_access_key` | AWS Access Credentials
+`aws_secret_key` | AWS Secret Credentials
+`aws_key_name` | Name of key pair already loaded in AWS
+`aws_region` | Region to deploy VPC to
+`cidr_base` | First three octets of CIDR address for VPC
+
+*N.B.* Please generate `cidr_base` with the following shell command so as to avoid collisions.
+```
+echo 10.$(( ( RANDOM % 250 )  + 1 )).$(( ( RANDOM % 254 )  + 1 ))
+```
+
 ## Outputs
 Variable | Purpose
 --- | --- |
