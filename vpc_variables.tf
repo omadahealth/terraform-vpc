@@ -18,10 +18,6 @@ variable "vpc_networks" {
     }
 }
 
-variable "domain" {
-    default = "phillips.jp"
-}
-
 variable "az3" {
     default = {
         us-west-2 = "us-west-2c"
