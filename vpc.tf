@@ -301,7 +301,7 @@ resource "aws_security_group" "natc" {
     vpc_id = "${aws_vpc.primary.id}"
 }
 
-output "datacenter_nat_subnet_default_security_group_id" {
+output "nat_client_sg" {
     value = "${aws_security_group.natc.id}"
 }
 
@@ -333,6 +333,12 @@ resource "aws_security_group" "nat" {
     ingress {
         from_port = 443
         to_port = 443
+        protocol = "tcp"
+        security_groups = ["${aws_security_group.natc.id}"]
+    }
+    ingress {
+        from_port = 9418
+        to_port = 9418
         protocol = "tcp"
         security_groups = ["${aws_security_group.natc.id}"]
     }
