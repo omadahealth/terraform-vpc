@@ -8,6 +8,7 @@ plan:
 		terraform plan -var-file terraform.tfvars -out terraform.tfplan
 
 apply:
+		terraform get -update
 		terraform apply -var-file terraform.tfvars
 
 destroy:
@@ -17,6 +18,7 @@ destroy:
 clean:
 		rm -f terraform.tfplan
 		rm -f terraform.tfstate
+		rm -f terraform.tfstate.backup
 
 
 test:
