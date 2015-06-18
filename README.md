@@ -1,0 +1,19 @@
+## Outputs
+```
+datacenter_id
+datacenter_network
+datacenter_subnet_dmzA_id
+datacenter_subnet_dmzB_id
+datacenter_subnet_natA_id
+datacenter_subnet_natB_id
+cache_client_sg
+cache_sg
+search_client_sg
+search_sg
+web_sg
+ssh_sg
+ssh_client_sg
+db_sg
+db_client_sg
+datacenter_nat_subnet_default_security_group_id
+```
