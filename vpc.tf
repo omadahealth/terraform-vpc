@@ -237,7 +237,7 @@ resource "aws_security_group" "ssh" {
         from_port = 22
         to_port = 22
         protocol = "tcp"
-        cidr_blocks = ["142.254.16.146/32","${lookup(var.vpc_networks,var.aws_region)}.0.0/16","23.121.240.216/32"]
+        cidr_blocks = ["${aws_security_group.sshc.id}"]
     }
 }
 
@@ -305,10 +305,10 @@ resource "aws_security_group" "nat" {
     vpc_id = "${aws_vpc.primary.id}"
 
     ingress {
-        from_port = 22
-        to_port = 22
+        from_port = 25
+        to_port = 25
         protocol = "tcp"
-        cidr_blocks = ["142.154.16.146/32"]
+        cidr_blocks = ["${aws_security_group.natc.id}"]
     }
     ingress {
         from_port = 80
@@ -319,6 +319,12 @@ resource "aws_security_group" "nat" {
     ingress {
         from_port = 443
         to_port = 443
+        protocol = "tcp"
+        security_groups = ["${aws_security_group.natc.id}"]
+    }
+    ingress {
+        from_port = 587
+        to_port = 587
         protocol = "tcp"
         security_groups = ["${aws_security_group.natc.id}"]
     }
@@ -342,7 +348,7 @@ resource "aws_instance" "nat" {
     ami = "${lookup(var.aws_nat_amis,var.aws_region)}"
     instance_type = "m3.medium"
     key_name = "${var.aws_key_name}"
-    security_groups = [ "${aws_security_group.nat.id}" ]
+    security_groups = [ "${aws_security_group.nat.id}", "${aws_security_group.ssh.id}" ]
     subnet_id = "${aws_subnet.dmzA.id}"
     source_dest_check = false
     tags {
