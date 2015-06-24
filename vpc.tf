@@ -290,6 +290,23 @@ output "db_client_sg" {
     value = "${aws_security_group.dbc.id}"
 }
 
+resource "aws_security_group" "egress" {
+    name = "vpc-${var.cidr_base}-EGRESS"
+    description = "Allow any to any"
+    vpc_id = "${aws_vpc.primary.id}"
+
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = [ "0.0.0.0/0" ]
+    }
+}
+
+output "egress_sg" {
+    value = "${aws_security_group.egress.id}"
+}
+
 ///////////////////////
 // vpn resources
 ///////////////////////
@@ -321,12 +338,36 @@ resource "aws_instance" "vpn" {
     instance_type = "m3.medium"
     key_name = "${var.aws_key_name}"
     subnet_id = "${aws_subnet.dmzA.id}"
-    vpc_security_group_ids = ["${aws_security_group.vpn.id}","${aws_security_group.ssh.id}","${aws_security_group.sshc.id}","${aws_security_group.web.id}"]
+    vpc_security_group_ids = ["${aws_security_group.vpn.id}","${aws_security_group.ssh.id}","${aws_security_group.sshc.id}","${aws_security_group.web.id}","${aws_security_group.egress.id}"]
     tags {
         Name = "vpc-${var.cidr_base}-vpn"
     }
+
+    // provisioning
+    // requires connection block
+    connection {
+        user = "ubuntu"
+        type = "ssh"
+        agent = "true"
+    }
+    provisioner "remote-exec" {
+        inline = [
+            "curl -o /tmp/openvpn-as.deb https://swupdate.openvpn.org/as/openvpn-as-2.0.17-Ubuntu14.amd_64.deb",
+            "sudo dpkg -i /tmp/openvpn-as.deb",
+            "sudo apt-get install -f",
+            "sudo usermod -p ${var.vpn_passwd} -s /bin/false openvpn"
+        ]
+    }
 }
 
+resource "aws_eip" "vpn" {
+    instance = "${aws_instance.vpn.id}"
+    vpc = true
+}
+
+output "vpn_ip" {
+    value = "${aws_eip.vpn.public_ip}"
+}
 
 ///////////////////////
 // nat resources
@@ -393,7 +434,7 @@ resource "aws_instance" "nat" {
     ami = "${lookup(var.aws_nat_amis,var.aws_region)}"
     instance_type = "m3.medium"
     key_name = "${var.aws_key_name}"
-    vpc_security_group_ids = [ "${aws_security_group.nat.id}", "${aws_security_group.ssh.id}" ]
+    vpc_security_group_ids = [ "${aws_security_group.nat.id}", "${aws_security_group.ssh.id}","${aws_security_group.egress.id}" ]
     subnet_id = "${aws_subnet.dmzA.id}"
     source_dest_check = false
     tags {

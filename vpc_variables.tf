@@ -7,6 +7,7 @@ variable "aws_secret_key" {}
 variable "cidr_base" {}
 variable "aws_key_name" {}
 variable "my_ip" {}
+variable "vpn_passwd" {}
 
 variable "aws_region" {
     default = "us-west-2"
@@ -28,7 +29,7 @@ variable "aws_nat_amis" {
 
 variable "aws_vpn_amis" {
     default = {
-        us-west-2 = "ami-8dcef5bd"
-        us-east-1 = "ami-866a52ee"
+        us-west-2 = "ami-ade2da9d"
+        us-east-1 = "ami-3b6a8050"
     }
 }
