@@ -239,6 +239,13 @@ resource "aws_security_group" "ssh" {
         protocol = "tcp"
         security_groups = ["${aws_security_group.sshc.id}"]
     }
+
+    ingress {
+        from_port = 22
+        to_port = 22
+        protocol = "tcp"
+        cidr_blocks = [ "${var.my_ip}/32" ]
+    }
 }
 
 output "ssh_sg" {
@@ -282,6 +289,44 @@ resource "aws_security_group" "dbc" {
 output "db_client_sg" {
     value = "${aws_security_group.dbc.id}"
 }
+
+///////////////////////
+// vpn resources
+///////////////////////
+
+// Security Group
+resource "aws_security_group" "vpn" {
+    name = "vpc-${var.cidr_base}-VPN"
+    description = "Allow VPN"
+    vpc_id = "${aws_vpc.primary.id}"
+
+    ingress {
+        from_port = 943
+        to_port = 943
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+    ingress {
+        from_port = 1194
+        to_port = 1194
+        protocol = "udp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+}
+
+//// instance
+
+resource "aws_instance" "vpn" {
+    ami = "${lookup(var.aws_vpn_amis,var.aws_region)}"
+    instance_type = "m3.medium"
+    key_name = "${var.aws_key_name}"
+    subnet_id = "${aws_subnet.dmzA.id}"
+    vpc_security_group_ids = ["${aws_security_group.vpn.id}","${aws_security_group.ssh.id}","${aws_security_group.sshc.id}","${aws_security_group.web.id}"]
+    tags {
+        Name = "vpc-${var.cidr_base}-vpn"
+    }
+}
+
 
 ///////////////////////
 // nat resources
