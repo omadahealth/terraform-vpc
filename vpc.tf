@@ -133,7 +133,7 @@ resource "aws_security_group" "mesos" {
     }
 }
 
-output "mesos" {
+output "mesos_sg" {
     value = "${aws_security_group.mesos.id}"
 }
 
