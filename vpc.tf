@@ -120,6 +120,23 @@ resource "aws_route_table_association" "natB-nat" {
 }
 
 // Security Groups
+resource "aws_security_group" "mesos" {
+    name = "vpc-${var.cidr_base}-MESOS"
+    description = "Whitelist Mesos Master-Slave Comms"
+    vpc_id = "${aws_vpc.primary.id}"
+
+    ingress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        self = "true"
+    }
+}
+
+output "mesos" {
+    value = "${aws_security_group.mesos.id}"
+}
+
 resource "aws_security_group" "cachec" {
     name = "vpc-${var.cidr_base}-CACHE-Clients"
     description = "Whitelist Redis (tcp 6379)"
@@ -425,6 +442,12 @@ resource "aws_security_group" "nat" {
         to_port = -1
         protocol = "icmp"
         security_groups = ["${aws_security_group.natc.id}"]
+    }
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = [ "0.0.0.0/0" ]
     }
 }
 
