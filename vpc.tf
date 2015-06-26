@@ -369,6 +369,7 @@ resource "aws_instance" "vpn" {
     }
     provisioner "remote-exec" {
         inline = [
+            "sudo apt-get update",
             "curl -o /tmp/openvpn-as.deb https://swupdate.openvpn.org/as/openvpn-as-2.0.17-Ubuntu14.amd_64.deb",
             "sudo dpkg -i /tmp/openvpn-as.deb",
             "sudo apt-get install -f",
