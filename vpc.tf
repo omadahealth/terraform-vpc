@@ -375,8 +375,7 @@ resource "aws_instance" "vpn" {
             "sudo usermod -p ${var.vpn_passwd} -s /bin/false openvpn",
             "sudo apt-get install --no-install-recommends -y python python-dev gcc python-pip libpython2.7-stdlib git curl make automake libssl-dev zlibc",
             "sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*",
-            "sudo pip install ansible httplib2",
-            "sudo apt-get purge -y make automake"
+            "sudo pip install ansible httplib2"
         ]
     }
 }
