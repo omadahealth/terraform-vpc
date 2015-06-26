@@ -369,12 +369,13 @@ resource "aws_instance" "vpn" {
     }
     provisioner "remote-exec" {
         inline = [
-            "sudo apt-get update",
             "curl -o /tmp/openvpn-as.deb https://swupdate.openvpn.org/as/openvpn-as-2.0.17-Ubuntu14.amd_64.deb",
             "sudo dpkg -i /tmp/openvpn-as.deb",
+            "sudo apt-get update",
             "sudo apt-get install -f",
+            "sudo apt-get update",
+            "sudo apt-get install -y --no-install-recommends python python-dev gcc python-pip libpython2.7-stdlib git curl make automake libssl-dev zlibc",
             "sudo usermod -p ${var.vpn_passwd} -s /bin/false openvpn",
-            "sudo apt-get install --no-install-recommends -y python python-dev gcc python-pip libpython2.7-stdlib git curl make automake libssl-dev zlibc",
             "sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*",
             "sudo pip install ansible httplib2"
         ]
