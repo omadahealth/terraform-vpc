@@ -335,6 +335,20 @@ resource "aws_security_group" "vpn" {
     vpc_id = "${aws_vpc.primary.id}"
 
     ingress {
+        from_port = 80
+        to_port = 80
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 443
+        to_port = 443
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
         from_port = 943
         to_port = 943
         protocol = "tcp"
@@ -355,7 +369,7 @@ resource "aws_instance" "vpn" {
     instance_type = "m3.medium"
     key_name = "${var.aws_key_name}"
     subnet_id = "${aws_subnet.dmzA.id}"
-    vpc_security_group_ids = ["${aws_security_group.vpn.id}","${aws_security_group.ssh.id}","${aws_security_group.sshc.id}","${aws_security_group.web.id}","${aws_security_group.egress.id}"]
+    vpc_security_group_ids = ["${aws_security_group.vpn.id}","${aws_security_group.ssh.id}","${aws_security_group.sshc.id}","${aws_security_group.mesos.id}","${aws_security_group.egress.id}"]
     tags {
         Name = "vpc-${var.cidr_base}-vpn"
     }
