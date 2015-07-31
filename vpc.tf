@@ -131,6 +131,12 @@ resource "aws_security_group" "mesos" {
         protocol = "-1"
         self = "true"
     }
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = [ "0.0.0.0/0" ]
+    }
 }
 
 output "mesos_sg" {
@@ -158,6 +164,12 @@ resource "aws_security_group" "cache" {
         protocol = "tcp"
         self = "true"
         security_groups = ["${aws_security_group.cachec.id}"]
+    }
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = [ "0.0.0.0/0" ]
     }
 }
 
@@ -216,6 +228,13 @@ resource "aws_security_group" "search" {
         self = "true"
         security_groups = ["${aws_security_group.searchc.id}"]
     }
+
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = [ "0.0.0.0/0" ]
+    } 
 }
 
 output "search_sg" {
@@ -239,6 +258,13 @@ resource "aws_security_group" "web" {
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }
+
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = [ "0.0.0.0/0" ]
+    } 
 }
 
 output "web_sg" {
@@ -262,6 +288,13 @@ resource "aws_security_group" "ssh" {
         to_port = 22
         protocol = "tcp"
         cidr_blocks = [ "${var.my_ip}/32" ]
+    }
+
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = [ "0.0.0.0/0" ]
     }
 }
 
@@ -290,6 +323,13 @@ resource "aws_security_group" "db" {
         protocol = "tcp"
         self = "true"
         security_groups = ["${aws_security_group.dbc.id}"]
+    }
+
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = [ "0.0.0.0/0" ]
     }
 }
 
@@ -360,6 +400,13 @@ resource "aws_security_group" "vpn" {
         protocol = "udp"
         cidr_blocks = ["0.0.0.0/0"]
     }
+
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = [ "0.0.0.0/0" ]
+    }
 }
 
 //// instance
@@ -427,41 +474,12 @@ resource "aws_security_group" "nat" {
     vpc_id = "${aws_vpc.primary.id}"
 
     ingress {
-        from_port = 25
-        to_port = 25
-        protocol = "tcp"
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
         security_groups = ["${aws_security_group.natc.id}"]
     }
-    ingress {
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        security_groups = ["${aws_security_group.natc.id}"]
-    }
-    ingress {
-        from_port = 443
-        to_port = 443
-        protocol = "tcp"
-        security_groups = ["${aws_security_group.natc.id}"]
-    }
-    ingress {
-        from_port = 587
-        to_port = 587
-        protocol = "tcp"
-        security_groups = ["${aws_security_group.natc.id}"]
-    }
-    ingress {
-        from_port = 9418
-        to_port = 9418
-        protocol = "tcp"
-        security_groups = ["${aws_security_group.natc.id}"]
-    }
-    ingress {
-        from_port = -1
-        to_port = -1
-        protocol = "icmp"
-        security_groups = ["${aws_security_group.natc.id}"]
-    }
+
     egress {
         from_port = 0
         to_port = 0
