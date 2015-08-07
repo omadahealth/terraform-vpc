@@ -6,10 +6,18 @@ Input | Purpose
 `aws_key_name` | Name of key pair already loaded in AWS
 `aws_region` | Region to deploy VPC to
 `cidr_base` | First three octets of CIDR address for VPC
+`vpn_passwd` | Encryped password for openvpn user on VPN host
+`my_ip` | Your static IPv4 address
 
 *N.B.* Please generate `cidr_base` with the following shell command so as to avoid collisions.
 ```
 echo 10.$(( ( RANDOM % 250 )  + 1 )).$(( ( RANDOM % 254 )  + 1 ))
+```
+
+*N.B.* Please generate `vpn_passwd` with the following shell command. Substitute `<your-password>` with your password -- this password must be less than or equal to 8 characters.
+```
+export PASSWORD='<your-password>' \
+openssl passwd -crypt $PASSWORD
 ```
 
 ## Outputs
@@ -31,3 +39,5 @@ Variable | Purpose
 `db_sg` | Allow communcation on `tcpv4:5432` for hosts with `db_client_sg` applied.
 `db_client_sg` | Whitelist security group for postgresql servers. Any host that has this security group applied will be able to communicate on `tcpv4:5432` to hosts which have `db_sg` applied .
 `nat_client_sg` | Whitelist security group for nat servers. Any host that has this security group applied will be able to communicate on `tcpv4:25`, `tcpv4:80`, `tcpv4:443`, `tcpv4:587`, and `icmp:-1` to the NAT instance. This allows these communications to be translated to the public internet. If this security group is *not* applied, interfaces will not be able to communicate with the public internet.
+`ipsec_public_ip` | Public ip address of IPSEC instance 
+`ipsec_private_ip` | Private ip address of IPSEC instance

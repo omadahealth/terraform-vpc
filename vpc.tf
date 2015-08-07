@@ -287,7 +287,7 @@ resource "aws_security_group" "ssh" {
         from_port = 22
         to_port = 22
         protocol = "tcp"
-        cidr_blocks = [ "${var.my_ip}/32" ]
+        cidr_blocks = [ "${var.my_ip}/32","192.168.0.0/16" ]
     }
 
     egress {
@@ -508,6 +508,72 @@ resource "aws_eip" "nat" {
 }
 
 ///////////////////////
+// ipsec resources
+///////////////////////
+
+// Security Group
+
+resource "aws_security_group" "ipsec" {
+    name = "vpc-${var.cidr_base}-IPSEC"
+    description = "Allow IPSEC"
+    vpc_id = "${aws_vpc.primary.id}"
+
+    ingress {
+        from_port = 50
+        to_port = 51
+        protocol = "-1"
+        cidr_blocks = [ "0.0.0.0/0" ]
+    }
+
+    ingress {
+        from_port = 500
+        to_port = 500
+        protocol = "udp"
+        cidr_blocks = [ "0.0.0.0/0" ]
+    }
+
+    ingress {
+        from_port = 4500
+        to_port = 4500
+        protocol = "udp"
+        cidr_blocks = [ "0.0.0.0/0" ]
+    }
+
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = [ "0.0.0.0/0" ]
+    }
+}
+
+// Instance
+
+resource "aws_instance" "ipsec" {
+    ami = "${lookup(var.aws_deb_amis,var.aws_region)}"
+    instance_type = "m3.medium"
+    key_name = "${var.aws_key_name}"
+    vpc_security_group_ids = ["${aws_security_group.ipsec.id}","${aws_security_group.ssh.id}"]
+    subnet_id = "${aws_subnet.dmzA.id}"
+    tags {
+        Name = "vpc-${var.cidr_base}-ipsec"
+    }
+}
+
+resource "aws_eip" "ipsec" {
+    instance = "${aws_instance.ipsec.id}"
+    vpc = true
+}
+
+output "ipsec_public_ip" {
+    value = "${aws_instance.ipsec.public_ip}"
+}
+
+output "ipsec_private_ip" {
+    value = "${aws_instance.ipsec.private_ip}"
+}
+
+///////////////////////
 // Networking resources
 ///////////////////////
 
@@ -516,6 +582,10 @@ resource "aws_route_table" "dmz" {
     route {
         cidr_block = "0.0.0.0/0"
         gateway_id = "${aws_internet_gateway.igw.id}"
+    }
+    route {
+        cidr_block = "192.168.0.0/16"
+        instance_id = "${aws_instance.ipsec.id}"
     }
     tags {
         Name = "vpc-${var.cidr_base}-dmz-rtb"

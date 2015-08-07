@@ -29,7 +29,15 @@ variable "aws_nat_amis" {
 
 variable "aws_vpn_amis" {
     default = {
-        us-west-2 = "ami-ade2da9d"
-        us-east-1 = "ami-3b6a8050"
+        us-west-2 = "ami-8dcef5bd"
+        us-east-1 = "ami-866a52ee"
     }
 }
+
+variable "aws_deb_amis" {
+    default = {
+        us-west-2 = "ami-8dcef5bd"
+        us-east-1 = "ami-866a52ee"
+    }
+}
+
