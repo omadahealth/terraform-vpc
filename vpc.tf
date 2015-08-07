@@ -520,6 +520,13 @@ resource "aws_security_group" "ipsec" {
 
     ingress {
         from_port = 50
+        to_port = 50
+        protocol = "-1"
+        cidr_blocks = [ "0.0.0.0/0" ]
+    }
+
+    ingress {
+        from_port = 51
         to_port = 51
         protocol = "-1"
         cidr_blocks = [ "0.0.0.0/0" ]
