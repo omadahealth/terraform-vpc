@@ -567,7 +567,7 @@ resource "aws_eip" "ipsec" {
 }
 
 output "ipsec_public_ip" {
-    value = "${aws_instance.ipsec.public_ip}"
+    value = "${aws_eip.ipsec.public_ip}"
 }
 
 output "ipsec_private_ip" {
