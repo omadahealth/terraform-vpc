@@ -535,7 +535,7 @@ resource "aws_security_group" "ipsec" {
     ingress {
         from_port = -1
         to_port = -1
-        protocol = "imcp"
+        protocol = "icmp"
         cidr_blocks = [ "192.168.0.0/16", "${var.my_ip}/32", "${var.cidr_base}.0/24" ]
     }
 
