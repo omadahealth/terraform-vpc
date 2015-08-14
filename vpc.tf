@@ -532,6 +532,13 @@ resource "aws_security_group" "ipsec" {
         cidr_blocks = [ "0.0.0.0/0" ]
     }
 
+    ingress {
+        from_port = -1
+        to_port = -1
+        protocol = "imcp"
+        cidr_blocks = [ "192.168.0.0/16", "${var.my_ip}/32", "${var.cidr_base}.0/24" ]
+    }
+
     egress {
         from_port = 0
         to_port = 0
