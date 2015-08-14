@@ -548,6 +548,7 @@ resource "aws_instance" "ipsec" {
     key_name = "${var.aws_key_name}"
     vpc_security_group_ids = ["${aws_security_group.ipsec.id}","${aws_security_group.ssh.id}"]
     subnet_id = "${aws_subnet.dmzA.id}"
+    source_dest_check = "false"
     tags {
         Name = "vpc-${var.cidr_base}-ipsec"
     }
