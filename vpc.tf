@@ -553,7 +553,7 @@ resource "aws_instance" "ipsec" {
     ami = "${lookup(var.aws_deb_amis,var.aws_region)}"
     instance_type = "m3.medium"
     key_name = "${var.aws_key_name}"
-    vpc_security_group_ids = ["${aws_security_group.ipsec.id}","${aws_security_group.ssh.id}"]
+    vpc_security_group_ids = ["${aws_security_group.ipsec.id}","${aws_security_group.ssh.id}","${aws_security_group.sshc.id}"]
     subnet_id = "${aws_subnet.dmzA.id}"
     source_dest_check = "false"
     tags {
