@@ -120,6 +120,29 @@ resource "aws_route_table_association" "natB-nat" {
 }
 
 // Security Groups
+resource "aws_security_group" "jenkins" {
+    name = "vpc-${var.cidr_base}-JENKINS"
+    description = "Whitelist Allow access to the HTTP Alternate Listener for Jenkins"
+    vpc_id = "${aws_vpc.primary.id}"
+
+    ingress {
+        from_port = 8080
+        to_port = 8080
+        protocol = "tcp"
+        self = "true"
+    }
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = [ "0.0.0.0/0" ]
+    }
+}
+
+output "jenkins_sg" {
+    value = "${aws_security_group.jenkins.id}"
+}
+
 resource "aws_security_group" "mesos" {
     name = "vpc-${var.cidr_base}-MESOS"
     description = "Whitelist Mesos Master-Slave Comms"
