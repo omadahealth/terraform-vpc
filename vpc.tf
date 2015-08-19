@@ -432,6 +432,10 @@ resource "aws_security_group" "vpn" {
     }
 }
 
+output "vpn_sg" {
+    value = "${aws_security_group.vpn.id}"
+}
+
 //// instance
 
 resource "aws_instance" "vpn" {
