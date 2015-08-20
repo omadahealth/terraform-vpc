@@ -188,6 +188,15 @@ resource "aws_security_group" "cache" {
         self = "true"
         security_groups = ["${aws_security_group.cachec.id}"]
     }
+
+    ingress {
+        from_port = 49000
+        to_port = 50000
+        protocol = "tcp"
+        self = "true"
+        security_groups = ["${aws_security_group.cachec.id}"]
+    }
+
     egress {
         from_port = 0
         to_port = 0
