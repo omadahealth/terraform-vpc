@@ -547,6 +547,10 @@ resource "aws_eip" "nat" {
     vpc = true
 }
 
+output "nat_id" {
+    value = "${aws_instance.nat.id}"
+}
+
 ///////////////////////
 // ipsec resources
 ///////////////////////
