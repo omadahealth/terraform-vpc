@@ -35,6 +35,10 @@ resource "aws_internet_gateway" "igw" {
     vpc_id = "${aws_vpc.primary.id}"
 }
 
+output "datacenter_igw_id" {
+    value = "${aws_internet_gateway.igw.id}"
+}
+
 ///////////////////////
 // subnet resources
 ///////////////////////
